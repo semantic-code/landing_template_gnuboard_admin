@@ -128,6 +128,7 @@ include_once(G5_ADMIN_PATH.'/admin.head.php');
 
 <script>
     var $target = $("input[name='chk_ld_page']");
+    
     function on_submit(f){
         if(Number($target.val()) === 0){
             alert('랜딩 아이디 중복확인이 필요합니다.');
@@ -167,4 +168,5 @@ include_once(G5_ADMIN_PATH.'/admin.head.php');
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
 
