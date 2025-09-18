@@ -140,7 +140,7 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
             </tr>
         <?php  endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="8">등록된 랜딩이 없습니다.</td></tr>
+            <tr><td colspan="10">등록된 랜딩이 없습니다.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
@@ -163,3 +163,4 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
