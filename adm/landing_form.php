@@ -145,10 +145,7 @@ include_once(G5_ADMIN_PATH.'/admin.head.php');
         $(document).on('click', '#btn_id_check', function(){
             const ld_page = $('#ld_page').val();
 
-            if(!ld_page){
-                alert('랜딩 ID값이 누락되었습니다.');
-                return false;
-            }
+            if(!ld_page) alert('랜딩 ID값이 누락되었습니다.'), false;
 
             $.post('landing_form_check.php', {ld_page}, function(data){
                 if(data.state === 'success'){
@@ -168,5 +165,6 @@ include_once(G5_ADMIN_PATH.'/admin.head.php');
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
 
 
