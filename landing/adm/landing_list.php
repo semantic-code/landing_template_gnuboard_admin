@@ -135,7 +135,7 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
                 <td style="display: flex; justify-content: center; gap: .7rem;">
                     <a href="./landing_preview.php?ld_page=<?=$row['ld_page']?>" class="btn btn_02" onclick="return open_preview(this.href);">미리보기</a>
                     <a href="./landing_form.php?w=u&ld_page=<?php echo $row['ld_page']; ?>" class="btn btn_03">수정</a>
-                    <a href="./landing_list_update.php?w=d&ld_page=<?php echo $row['ld_page']; ?>" class="btn btn_01" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                    <a href="./landing_list_update.php?w=d&ld_page=<?php echo $row['ld_page']; ?>&ld_id=<?= $row['ld_id'] ?>" class="btn btn_01" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
                 </td>
             </tr>
         <?php  endforeach; ?>
@@ -163,4 +163,5 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
 
