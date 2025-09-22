@@ -70,8 +70,7 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./landing_form.php" class="btn btn_02">랜딩페이지 추가(첨부파일)</a>
-    <a href="./landing_editor_form.php" class="btn btn_03">랜딩페이지 추가(에디터)</a>
+    <a href="./landing_form.php" class="btn btn_02">랜딩페이지 추가</a>    
 </div>
 
 <div class="tbl_head01 tbl_wrap">
@@ -164,3 +163,4 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
