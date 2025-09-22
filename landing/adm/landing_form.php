@@ -33,12 +33,6 @@ if($w == 'u'){
 $g5['title'] = $html_title;
 include_once(G5_ADMIN_PATH.'/admin.head.php');
 
-/*
-echo "<pre>";
-print_r($landing['file']);
-echo "</pre>";
-*/
-
 ?>
 
 <form name="frmLanding" id="frmLanding" action="./landing_form_update.php" method="post" enctype="multipart/form-data" onsubmit="return on_submit(this)">
@@ -105,7 +99,7 @@ echo "</pre>";
             </tr>
             <tr>
                 <th scope="row"><label for="ld_content">이미지 첨부</label></th>
-                <td><?= file_upload_html('landing', 'bf_file[]', 'file_input', true, true, $landing['file']) ?></td>
+                <td><?= file_upload_html('landing', 'bf_file[]', 'file_input') ?></td>
             </tr>
             <tr>
                 <th scope="row"><label for="ld_fields">폼 필드명 정의</label></th>
@@ -179,3 +173,4 @@ echo "</pre>";
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
