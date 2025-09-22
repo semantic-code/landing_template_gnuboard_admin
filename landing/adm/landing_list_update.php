@@ -2,40 +2,30 @@
 $sub_menu = "800100";
 require_once './_common.php';
 
-/*
-echo "<pre>";
-print_r($_GET);
-echo "</pre>";
-exit;
-*/
+$bo_table = 'landing';
+
 if (!$ld_page) alert('잘못된 접근입니다.');
 
 if($w === 'd'){
-    //파일목록 불러오기
-    $sql = "SELECT ld_files FROM {$g5['landing']} WHERE ld_page = '{$ld_page}' ";
-    $row = sql_fetch($sql);
-    if ($row && !empty($row['ld_files'])) {
-        $files = explode('|', $row['ld_files']);
-
-        foreach ($files as $fname) {
-            // 보안: 경로 검증 (2509/파일명.jpg 형태만 허용)
-            if (preg_match('/^[0-9]{4}\/[a-zA-Z0-9._-]+$/', $fname)) {
-                $file_path = G5_PATH.'/data/editor/'.$fname;
-                if (is_file($file_path)) @unlink($file_path);
-            }
-        }
+    //파일 삭제
+    $sql = "SELECT bf_file FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
+    $result = sql_query($sql);
+    while ($row = mysqli_fetch_array($result)) {
+        $file_path = G5_DATA_PATH.'/file/'.$bo_table.'/'.$row['bf_file'];
+        if (is_file($file_path)) @unlink($file_path);
     }
+    //db 삭제
+    $sql = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
+    sql_query($sql);
 
-    // landing/{ld_page} 폴더 삭제 (재귀적으로)
-    $landing_dir = G5_PATH.'/landing/'.$ld_page;
-    rrmdir($landing_dir);
+    //랜딩페이지 삭제
+    $sql = "DELETE FROM {$g5['landing']} WHERE ld_id = '{$ld_id}' AND ld_page = '{$ld_page}' ";
+    sql_query($sql);
 
-    $delete = sql_query("DELETE FROM {$g5['landing']} WHERE ld_page = '{$ld_page}' ");
-    if($delete){
-        goto_url("./landing_list.php");
-    }else{
-        alert("삭제에 실패했습니다.");
-    }
+    // landing/{ld_page} 폴더 삭제
+    rrmdir(G5_PATH.'/landing/'.$ld_page);
+
+    goto_url("./landing_list.php");
 }
 
 function rrmdir($dir) {
