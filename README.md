@@ -10,3 +10,10 @@ $g5['landing_log'] = G5_TABLE_PREFIX.'landing_log';
 ```php
 if($member['mb_id'] !== 'admin') goto_url('./landing_index.php')
 ```
+- g5_landing.sql
+```sql
+```
+
+- g5_landing_log.sql
+```sql
+```
