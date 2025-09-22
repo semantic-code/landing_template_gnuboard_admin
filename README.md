@@ -1,8 +1,10 @@
 - /data/dbconfig.php
 
+```php
 //추가
 $g5['landing'] = G5_TABLE_PREFIX.'landing';
 $g5['landing_log'] = G5_TABLE_PREFIX.'landing_log';
+```
 
 - /adm/index.php
 
