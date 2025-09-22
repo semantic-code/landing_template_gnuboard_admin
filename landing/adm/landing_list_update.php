@@ -23,7 +23,7 @@ if($w === 'd'){
     sql_query($sql);
 
     // landing/{ld_page} 폴더 삭제
-    rrmdir(G5_PATH.'/landing/'.$ld_page);
+    rrmdir(G5_PATH.'/'.$bo_table.'/'.$ld_page);
 
     goto_url("./landing_list.php");
 }
