@@ -28,6 +28,9 @@ if($w == 'u'){
 
 }else{
     $html_title.= ' 등록';
+
+    $landing = array();
+    $landing['file'] = array();
 }
 
 $g5['title'] = $html_title;
@@ -173,5 +176,6 @@ include_once(G5_ADMIN_PATH.'/admin.head.php');
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
 
 
