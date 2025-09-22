@@ -26,9 +26,9 @@ function file_upload_html(
     string $bo_table = '',
     string $name = 'bf_file[]',
     string $id = 'file_input',
+    array $files = array(),
     bool $multiple = true,
-    bool $include_style = true,
-    array $files = array()
+    bool $include_style = true
 ):string{
     ob_start(); ?>
 
@@ -105,7 +105,7 @@ function get_file_upload_js(
             });
         });
 
-        // 삭제 버튼 (기존 파일은 del_file[] 추가, 새 파일은 그냥 제거)
+        // 삭제 버튼
         $(document).on('click', '.remove_btn', function(){
             const $box = $(this).closest('.file_upload_box');
             $box.find('input[name="keep_file[]"]').remove();
