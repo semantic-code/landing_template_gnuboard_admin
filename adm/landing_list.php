@@ -127,7 +127,7 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
                 </td>
                 <td>
                     <?php if ($is_created): ?>
-                    <a href="/landing/?ld_page=<?= $row['ld_page'] ?>" class="btn btn_03">랜딩페이지 바로가기</a>
+                    <a href="/landing/?ld_page=<?= $row['ld_page'] ?>" target="_blank" class="btn btn_03">랜딩페이지 바로가기</a>
                     <?php else: ?>
                     <a href="./landing_skin_create.php?ld_page=<?= $row['ld_page'] ?>" onclick="return confirm('스킨을 생성하시겠습니까?');" class="btn btn_02">생성하기</a>
                     <?php endif; ?>
@@ -156,10 +156,11 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
             "landingPreview",
             "width=500,height=800,scrollbars=yes,resizable=yes"
         );
-        return false; // 링크 이동 막고 팝업만 열기
+        return false;
     }
 </script>
 
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
