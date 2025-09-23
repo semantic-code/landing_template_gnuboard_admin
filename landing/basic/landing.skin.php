@@ -19,7 +19,7 @@ foreach ($file as $row) {
     }
 }
 
-//카테고리 설정 $ldg_cate
+//초기 카테고리 설정 $ldg_cate_default
 list($ldg_cate,) = explode('|', $get_data['ld_category_list']);
 //입력필드명 설정 $ld_field_1, $ld_field_2, $ld_field_3...
 $arr_field = explode('|', $get_data['ld_fields']);
@@ -60,7 +60,7 @@ foreach ($arr_field as $row) {
         <div class="landing-form-wrap">
             <form id="landing_form" action="<?= $skin_url ?>/landing.skin_update.php" method="post" class="landing-form">
                 <input type="hidden" name="ld_page" value="<?= $get_data['ld_page'] ?>">
-                <input type="hidden" name="ldg_cate" value="<?= $ldg_cate ?? '대기중' ?>">
+                <input type="hidden" name="ldg_cate" value="<?= $ldg_cate_default ?? '대기중' ?>">
 
                 <?php if($ld_field_1): ?>
                     <label>
@@ -104,5 +104,6 @@ foreach ($arr_field as $row) {
 
 <?php
 include_once(G5_PATH.'/tail.sub.php');
+
 
 
