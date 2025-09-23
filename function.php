@@ -24,9 +24,9 @@ function build_query(array $data, array $editor_fields = array()):string {
 
 function file_upload_html(
     string $bo_table = '',
-    string $name = 'bf_file[]',
-    string $id = 'file_input',
     array $files = array(),
+    string $name = 'bf_file[]',
+    string $id = 'file_input',    
     bool $multiple = true,
     bool $include_style = true
 ):string{
