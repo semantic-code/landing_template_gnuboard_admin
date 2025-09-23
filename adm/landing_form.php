@@ -108,7 +108,7 @@ echo "</pre>";
             </tr>
             <tr>
                 <th scope="row"><label for="ld_content">이미지 첨부</label></th>
-                <td><?= file_upload_html('landing', 'bf_file[]', 'file_input', $landing['file']) ?></td>
+                <td><?= file_upload_html('landing', $landing['file']) ?></td>
             </tr>
             <tr>
                 <th scope="row"><label for="ld_fields">폼 필드명 정의</label></th>
@@ -182,3 +182,4 @@ echo "</pre>";
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
