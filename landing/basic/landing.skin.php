@@ -1,4 +1,7 @@
 <?php
+//<title>
+$config['cf_title'] = '성내동 치과';
+
 include_once(G5_PATH.'/head.sub.php');
 
 $bo_table = 'landing';
@@ -101,4 +104,5 @@ foreach ($arr_field as $row) {
 
 <?php
 include_once(G5_PATH.'/tail.sub.php');
+
 
