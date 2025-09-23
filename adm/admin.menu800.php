@@ -5,8 +5,6 @@ while ($row = sql_fetch_array($result)){
     $get_data[] = $row;
 }
 
-print_r($get_data);
-
 if ($member['mb_id'] === 'admin') {
     $menu['menu800'] = array (
         array('800000', '랜딩페이지', G5_ADMIN_URL.'/landing_list.php', 'board'),
@@ -39,3 +37,4 @@ if ($member['mb_id'] === 'admin') {
         $menu['menu800'][] = array($sub_code, $v['ld_subject'], G5_ADMIN_URL.'/landing_log_list.php?ld_page='.$v['ld_page'], 'board');
     }
 }
+
