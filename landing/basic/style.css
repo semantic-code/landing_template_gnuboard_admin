@@ -1,7 +1,6 @@
 @charset "UTF-8";
 
-.landing-container {
-    max-width: 900px;
+.landing-container {    
     margin: 0 auto;
     padding-bottom: 150px; /* 하단 고정폼 공간 확보 */
 }
@@ -76,3 +75,4 @@
 .landing-form button:hover {
     background: #005bb5;
 }
+
