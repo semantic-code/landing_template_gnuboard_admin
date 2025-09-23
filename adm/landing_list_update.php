@@ -22,7 +22,11 @@ if($w === 'd'){
     $sql = "DELETE FROM {$g5['landing']} WHERE ld_id = '{$ld_id}' AND ld_page = '{$ld_page}' ";
     sql_query($sql);
 
-    // landing/{ld_page} 폴더 삭제
+    //수집 데이터 삭제
+    $sql = "DELETE FROM {$g5['landing_log']} WHERE ld_page = '{$ld_page}' ";
+    sql_query($sql);
+
+    //landing/{ld_page} 폴더 삭제
     rrmdir(G5_PATH.'/landing/'.$ld_page);
 
     goto_url("./landing_list.php");
