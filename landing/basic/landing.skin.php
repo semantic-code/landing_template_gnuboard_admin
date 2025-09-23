@@ -6,7 +6,7 @@ $bo_table = 'landing';
 $sql = "SELECT * FROM {$g5['landing']} WHERE ld_page = '{$ld_page}' ";
 $get_data = sql_fetch($sql);
 
-//이미지 파일 경로
+//이미지 파일 경로 $img_src_1, $img_src_2, $img_src_3
 $idx = 1;
 $file = get_file($bo_table, $get_data['ld_id']);
 foreach ($file as $row) {
@@ -16,8 +16,9 @@ foreach ($file as $row) {
     }
 }
 
-//카테고리 설정
+//카테고리 설정 $ldg_cate
 list($ldg_cate,) = explode('|', $get_data['ld_category_list']);
+//입력필드명 설정 $ld_field_1, $ld_field_2, $ld_field_3...
 $arr_field = explode('|', $get_data['ld_fields']);
 $idx = 1;
 foreach ($arr_field as $row) {
@@ -100,3 +101,4 @@ foreach ($arr_field as $row) {
 
 <?php
 include_once(G5_PATH.'/tail.sub.php');
+
