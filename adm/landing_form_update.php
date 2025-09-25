@@ -8,6 +8,7 @@ echo '<pre>';
 exit;
 */
 
+//$bo_table = 'landing';
 
 $upload_dir = G5_DATA_PATH.'/file/'.$bo_table;
 @mkdir($upload_dir, G5_DIR_PERMISSION, true);
@@ -162,4 +163,5 @@ if($w === ''){
         }
     }
     goto_url("./landing_form.php?w=u&ld_page={$ld_page}");
+
 }
