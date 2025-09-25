@@ -11,7 +11,7 @@ $g5['landing_log'] = G5_TABLE_PREFIX.'landing_log';
 if($member['mb_id'] !== 'admin') goto_url('./landing_index.php')
 ```
 - /adm/landing_form.php
-  ```php
+```php
 <?= file_upload_html('notice', $list['file'] ?? array()) ?>
 ```
 - /adm/landing_form_update.php
