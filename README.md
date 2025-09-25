@@ -15,7 +15,7 @@ if($member['mb_id'] !== 'admin') goto_url('./landing_index.php')
 <?= file_upload_html('notice', $list['file'] ?? array()) ?>
 ```
 - /adm/landing_form_update.php
-```javscript
+```javascript
 <script>
     <?= get_file_upload_js() ?>
 </script>
