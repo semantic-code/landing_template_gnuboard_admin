@@ -16,9 +16,8 @@ CREATE TABLE `g5_landing` (
   `ld_files` TEXT NULL DEFAULT NULL COMMENT '에디터에 저장되는 파일 이름' COLLATE 'utf8mb4_general_ci',
   `ld_access_id` TEXT NULL DEFAULT NULL COMMENT 'lid별 접근 아이디' COLLATE 'utf8mb4_general_ci',
   `ld_sort_field` TEXT NULL DEFAULT NULL COMMENT '정렬 (예 ld_id asc)' COLLATE 'utf8mb4_general_ci',
-  `ld_use_search` INT(10) NULL DEFAULT '0',
-  `ld_use` INT(10) NULL DEFAULT '1' COMMENT '사용 여부',
   `ld_use_search` INT(10) NULL DEFAULT '0' COMMENT '검색 사용',
+  `ld_use` INT(10) NULL DEFAULT '1' COMMENT '사용 여부',  
   `ld_title` VARCHAR(255) NULL DEFAULT NULL COMMENT '어드민 메뉴 타이틀 (기본값: 랜딩페이지)' COLLATE 'utf8mb4_general_ci',
   `ld_datetime` DATETIME NULL DEFAULT current_timestamp() COMMENT '저장날짜',
   PRIMARY KEY (`ld_id`) USING BTREE
