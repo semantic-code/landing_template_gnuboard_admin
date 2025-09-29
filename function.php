@@ -238,10 +238,11 @@ function attach_file(
 }
 
 /**
- * 게시물에 연결된 첨부파일을 모두 삭제
+ * 게시물에 연결된 첨부파일을 삭제
  *
  * @param string $bo_table   게시판 테이블명
  * @param int    $wr_id      글 고유 ID
+ * @param int|null $bf_no    첨부파일 중 일부만 삭제할 때 사용
  * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
  *
  * @return bool              성공 여부 (삭제할 파일이 없어도 true)
@@ -249,6 +250,7 @@ function attach_file(
 function delete_attach_file(
     string $bo_table,
     int $wr_id,
+    ?int $bf_no = null,
     string $upload_dir = ''
 ):bool {
     global $g5;
@@ -256,8 +258,9 @@ function delete_attach_file(
     if (!$bo_table || !$wr_id) return false;
 
     $upload_dir = $upload_dir ?: G5_DATA_PATH . "/file/{$bo_table}";
+    $bf_sql = is_null($bf_no) ? "" : " AND bf_no = '{$bf_no}' ";
 
-    $sql_select  = "SELECT * FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
+    $sql_select  = "SELECT * FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' {$bf_sql} ";
     $result = sql_query($sql_select);
     while ($file = sql_fetch_array($result)) {
         $file_path = "{$upload_dir}/{$file['bf_file']}";
@@ -267,7 +270,7 @@ function delete_attach_file(
         }
     }
     // DB 삭제
-    $sql_delete = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
+    $sql_delete = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' {$bf_sql}  ";
     $delete = sql_query($sql_delete);
 
     if (!$delete) return false;
