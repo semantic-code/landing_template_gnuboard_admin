@@ -171,7 +171,7 @@ function get_file_upload_js(
  * @param array  $files (기본 : $_FILES['bf_file'])
  * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
  *
- * @return array 업로드한 파일 정보
+ * @return bool  파일 업로드 성공여부
  **/
 function attach_file(
         string $bo_table,
