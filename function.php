@@ -175,7 +175,8 @@ function get_file_upload_js(
  **/
 function attach_file(
         string $bo_table,
-        int $wr_id, $files,
+        int $wr_id,
+        array $files,
         string $upload_dir = ''
 ): bool {
     global $g5;
