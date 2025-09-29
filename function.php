@@ -1,7 +1,20 @@
 <?php
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
-function build_query(array $data, array $editor_fields = array()):string {
+/**
+ * 배열 데이터를 SQL SET 구문 형태로 변환
+ *
+ * @param array $data            입력 데이터 (key => value 형태)
+ * @param array $editor_fields   에디터 전용 필드 배열 (addslashes 대신 stripslashes 저장)
+ *
+ * @return string                SQL SET 구문 문자열
+ *
+ * $sql = "INSERT INTO {$table} SET\n" . build_query($set);
+ */
+function build_query(
+        array $data,
+        array $editor_fields = array()
+):string {
     $set = array();
 
     foreach ($data as $key => $value) {
@@ -22,14 +35,26 @@ function build_query(array $data, array $editor_fields = array()):string {
     return implode(",\n", $set);
 }
 
+/**
+ * 파일 업로드 입력창 HTML 생성
+ *
+ * @param string $bo_table       게시판 테이블명 (기존 파일 미리보기 경로용)
+ * @param array  $files          기존 업로드된 파일 배열 (get_file() 결과 등)
+ * @param string $name           input name 속성명 (기본: bf_file[])
+ * @param string $id             input id 속성명 (기본: file_input)
+ * @param bool   $multiple       다중 업로드 허용 여부 (기본: true)
+ * @param bool   $include_style  CSS 포함 여부 (기본: true)
+ *
+ * @return string                파일 업로드 HTML 마크업 *
+ */
 function file_upload_html(
     string $bo_table = '',
     array $files = array(),
     string $name = 'bf_file[]',
-    string $id = 'file_input',    
+    string $id = 'file_input',
     bool $multiple = true,
     bool $include_style = true
-):string{
+):string {
     ob_start(); ?>
 
     <?php if($include_style): ?>
@@ -80,6 +105,15 @@ function file_upload_html(
     <?php return ob_get_clean();
 }
 
+/**
+ * 파일 업로드 미리보기 및 삭제 기능용 JavaScript 반환
+ *
+ * @param string $id            파일 input 요소의 id (기본: file_input)
+ * @param string $preview_id    미리보기 컨테이너 id (기본: preview_container)
+ *
+ * @return string               JavaScript 코드 (script 태그 제외)
+ *
+ */
 function get_file_upload_js(
     string $id = 'file_input',
     string $preview_id = 'preview_container'
@@ -115,4 +149,88 @@ function get_file_upload_js(
     <?php
     $html = ob_get_clean();
     return str_replace(['<script>', '</script>'], '', $html);
+}
+
+/**
+ * 파일 첨부 처리
+ *
+ * @param string $bo_table 게시판 테이블명
+ * @param int    $wr_id 글 고유 아이디
+ * @param array  $files $_FILES (기본 : ['bf_file'])
+ * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
+ *
+ * @return array 업로드한 파일 정보
+ **/
+function attach_file(
+        string $bo_table,
+        int $wr_id, $files,
+        string $upload_dir = ''
+): bool {
+    global $g5;
+
+    $upload_dir = $upload_dir ?: G5_DATA_PATH . "/file/{$bo_table}";
+
+    if (!is_dir($upload_dir)) {
+        @mkdir($upload_dir, G5_DIR_PERMISSION, true);
+        @chmod($upload_dir, G5_DIR_PERMISSION);
+    }
+
+    if (!isset($files['name']) || !is_array($files['name'])) {
+        return true;
+    }
+
+    for ($i = 0; $i < count($files['name']); $i++) {
+        if ($files['error'][$i] !== UPLOAD_ERR_OK || !$files['name'][$i]) continue;
+
+        //확장자 검사
+        $original_name = $files['name'][$i];
+        $ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+        $allow_ext = array('jpg', 'jpeg', 'gif', 'png');
+
+        if (!in_array($ext, $allow_ext)) {
+            alert("허용되지 않는 파일 형식입니다. ({$ext})");
+        }
+
+        //파일명 생성
+        $new_name = date('YmdHis') . '_' . md5(uniqid('', true)) . '.' . $ext;
+        $dest_path = "{$upload_dir}/{$new_name}";
+
+        //파일 이동
+        if (!move_uploaded_file($files['tmp_name'][$i], $dest_path)) {
+            return false;
+        }
+
+        @chmod($dest_path, G5_FILE_PERMISSION);
+
+        //이미지 정보
+        $bf_width = 0;
+        $bf_height = 0;
+        $img_info = getimagesize($dest_path);
+        if ($img_info) {
+            $bf_width = $img_info[0];
+            $bf_height = $img_info[1];
+        }
+
+        //DB 저당
+        $bf_source = sql_real_escape_string($original_name);
+        $bf_file = sql_real_escape_string($new_name);
+        $bf_filesize = (int)$files['size'][$i];
+
+        $sql = "
+            INSERT INTO {$g5['board_file_table']}
+            SET bo_table    = '{$bo_table}',
+                wr_id       = '{$wr_id}',
+                bf_no       = '{$i}',
+                bf_source   = '{$bf_source}',
+                bf_file     = '{$bf_file}',
+                bf_content  = '',
+                bf_filesize = '{$bf_filesize}',
+                bf_width    = '{$bf_width}',
+                bf_height   = '{$bf_height}',
+                bf_datetime = NOW()
+        ";
+        sql_query($sql);
+    }
+
+    return true;
 }
