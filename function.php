@@ -42,7 +42,7 @@ function build_query(
  * @param array  $files          기존 업로드된 파일 배열 (get_file() 결과 등)
  * @param string $name           input name 속성명 (기본: bf_file[])
  * @param string $id             input id 속성명 (기본: file_input)
- * @param bool $image_only       이미지 또는 파일 업로드 (기본 : true)
+ * @param bool   $image_only     이미지 또는 파일 업로드 (기본 : true)
  * @param bool   $multiple       다중 업로드 허용 여부 (기본: true)
  * @param bool   $include_style  CSS 포함 여부 (기본: true) *
  * @return string                파일 업로드 HTML 마크업 *
@@ -168,7 +168,7 @@ function get_file_upload_js(
  *
  * @param string $bo_table 게시판 테이블명
  * @param int    $wr_id 글 고유 아이디
- * @param array  $files $_FILES (기본 : ['bf_file'])
+ * @param array  $files (기본 : $_FILES['bf_file'])
  * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
  *
  * @return array 업로드한 파일 정보
