@@ -42,9 +42,9 @@ function build_query(
  * @param array  $files          기존 업로드된 파일 배열 (get_file() 결과 등)
  * @param string $name           input name 속성명 (기본: bf_file[])
  * @param string $id             input id 속성명 (기본: file_input)
+ * @param bool $image_only       이미지 또는 파일 업로드 (기본 : true)
  * @param bool   $multiple       다중 업로드 허용 여부 (기본: true)
- * @param bool   $include_style  CSS 포함 여부 (기본: true)
- *
+ * @param bool   $include_style  CSS 포함 여부 (기본: true) *
  * @return string                파일 업로드 HTML 마크업 *
  */
 function file_upload_html(
@@ -52,6 +52,7 @@ function file_upload_html(
     array $files = array(),
     string $name = 'bf_file[]',
     string $id = 'file_input',
+    bool $image_only = false,
     bool $multiple = true,
     bool $include_style = true
 ):string {
@@ -60,7 +61,7 @@ function file_upload_html(
     <?php if($include_style): ?>
         <style>
             .file_upload_wrapper {display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;}
-            .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
+            .file_upload_box {padding: 3px; width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
             .file_upload_box img {width: 100%; height: 100%; object-fit: cover;}
@@ -82,7 +83,7 @@ function file_upload_html(
         <!-- 새 파일 추가 버튼 -->
         <div class="file_upload_box add_box">
             <label for="<?= $id ?>"><span>+</span></label>
-            <input type="file" name="<?=$name ?>" id="<?= $id ?>" <?= $multiple ? 'multiple' : '' ?> accept="image/*">
+            <input type="file" name="<?=$name ?>" id="<?= $id ?>" <?= $multiple ? 'multiple' : '' ?> <?= $image_only ? 'accept="image/*"' : '' ?>>
         </div>
 
         <!-- 기존 파일 영역 -->
@@ -127,15 +128,26 @@ function get_file_upload_js(
             $('#<?= $preview_id ?>').empty();
 
             $.each(files, function(i, file){
-                const reader = new FileReader();
-                reader.onload = function(e){
-                    const $box = $('<div>', {class : 'file_upload_box'});
-                    const $img = $('<img>', {src : e.target.result});
-                    const $remove_btn = $('<button>', {class : 'remove_btn', text : 'X'});
-                    $box.append($img).append($remove_btn);
+                const ext = file.name.split('.').pop().toLowerCase();
+                const $box = $('<div>', {class : 'file_upload_box'});
+                const $remove_btn = $('<button>', {class : 'remove_btn', text : 'X'});
+
+                if (['jpg', 'jpeg', 'png', 'gif', 'wenp'].includes(ext)) {
+                    const reader = new FileReader();
+                    reader.onload = function(e){
+                        const $img = $('<img>', {src : e.target.result});
+
+                        $box.append($img).append($remove_btn);
+                        $('#<?= $preview_id ?>').append($box);
+                    };
+                    reader.readAsDataURL(file);
+
+                }else {
+                    const $file_info = $('<div>', {class: 'file-info'})
+                        .append(`<p><span>${file.name}</span></p>`);
+                    $box.append($file_info).append($remove_btn);
                     $('#<?= $preview_id ?>').append($box);
-                };
-                reader.readAsDataURL(file);
+                }
             });
         });
 
@@ -185,9 +197,9 @@ function attach_file(
         //확장자 검사
         $original_name = $files['name'][$i];
         $ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
-        $allow_ext = array('jpg', 'jpeg', 'gif', 'png');
 
-        if (!in_array($ext, $allow_ext)) {
+        $deny_ext = array('php', 'phar', 'exe', 'sh', 'js');
+        if (in_array($ext, $deny_ext)) {
             alert("허용되지 않는 파일 형식입니다. ({$ext})");
         }
 
