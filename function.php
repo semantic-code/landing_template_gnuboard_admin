@@ -12,8 +12,8 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
  * $sql = "INSERT INTO {$table} SET\n" . build_query($set);
  */
 function build_query(
-        array $data,
-        array $editor_fields = array()
+    array $data,
+    array $editor_fields = array()
 ):string {
     $set = array();
 
@@ -88,15 +88,15 @@ function file_upload_html(
 
         <!-- 기존 파일 영역 -->
         <div id="existing_files" style="display: flex; gap: .5rem;">
-        <?php if (!empty($files)): ?>
-            <?php foreach ($files as $file): ?>
-                <div class="file_upload_box">
-                    <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['bf_file'] ?>" alt="<?= $file['bf_source'] ?>">
-                    <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?>">X</button>
-                    <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?>">
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+            <?php if (!empty($files)): ?>
+                <?php foreach ($files as $file): ?>
+                    <div class="file_upload_box">
+                        <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['bf_file'] ?>" alt="<?= $file['bf_source'] ?>">
+                        <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?>">X</button>
+                        <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?>">
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- 새 파일 preview -->
@@ -166,18 +166,18 @@ function get_file_upload_js(
 /**
  * 파일 첨부 처리
  *
+ * @param array  $files (기본 : $_FILES['bf_file'])
  * @param string $bo_table 게시판 테이블명
  * @param int    $wr_id 글 고유 아이디
- * @param array  $files (기본 : $_FILES['bf_file'])
  * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
  *
  * @return bool  파일 업로드 성공여부
  **/
 function attach_file(
-        string $bo_table,
-        int $wr_id,
-        array $files,
-        string $upload_dir = ''
+    array $files,
+    string $bo_table,
+    int $wr_id,
+    string $upload_dir = ''
 ): bool {
     global $g5;
 
@@ -289,5 +289,4 @@ function delete_attach_file(
     if (!$delete) return false;
 
     return true;
-
 }
