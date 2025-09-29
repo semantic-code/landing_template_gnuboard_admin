@@ -20,7 +20,7 @@ if($member['mb_id'] !== 'admin') goto_url('./landing_index.php')
     <?= get_file_upload_js() ?>
 </script>
 ```
-- function file_upload_html($bo_table, $file, $name = 'bf_file[]', $id = 'file_input', $muliple = true, $include_style = true)
+- function file_upload_html($bo_table, $file_data, $name = 'bf_file[]', $id = 'file_input', $muliple = true, $include_style = true)
 ```php
 array $file : g5_board_file (WHERE 조건 :bo_table, wr_id)
 ```
