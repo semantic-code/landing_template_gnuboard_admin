@@ -211,7 +211,7 @@ function attach_file(
             $bf_height = $img_info[1];
         }
 
-        //DB 저당
+        //DB 저장
         $bf_source = sql_real_escape_string($original_name);
         $bf_file = sql_real_escape_string($new_name);
         $bf_filesize = (int)$files['size'][$i];
@@ -235,4 +235,43 @@ function attach_file(
     }
 
     return true;
+}
+
+/**
+ * 게시물에 연결된 첨부파일을 모두 삭제
+ *
+ * @param string $bo_table   게시판 테이블명
+ * @param int    $wr_id      글 고유 ID
+ * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
+ *
+ * @return bool              성공 여부 (삭제할 파일이 없어도 true)
+ */
+function delete_attach_file(
+    string $bo_table,
+    int $wr_id,
+    string $upload_dir = ''
+):bool {
+    global $g5;
+
+    if (!$bo_table || !$wr_id) return false;
+
+    $upload_dir = $upload_dir ?: G5_DATA_PATH . "/file/{$bo_table}";
+
+    $sql_select  = "SELECT * FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
+    $result = sql_query($sql_select);
+    while ($file = sql_fetch_array($result)) {
+        $file_path = "{$upload_dir}/{$file['bf_file']}";
+
+        if (is_file($file_path)) {
+            @unlink($file_path);
+        }
+    }
+    // DB 삭제
+    $sql_delete = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
+    $delete = sql_query($sql_delete);
+
+    if (!$delete) return false;
+
+    return true;
+
 }
