@@ -229,7 +229,9 @@ function attach_file(
                 bf_height   = '{$bf_height}',
                 bf_datetime = NOW()
         ";
-        sql_query($sql);
+        $insert = sql_query($sql);
+
+        if (!$insert) return false;
     }
 
     return true;
