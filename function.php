@@ -1,313 +1,90 @@
 <?php
-if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
+$sub_menu = "500100";
+require_once './_common.php';
+auth_check($auth[$sub_menu], "w");
 
-/**
- * 배열 데이터를 SQL SET 구문 형태로 변환
- *
- * @param array $data            입력 데이터 (key => value 형태)
- * @param array $editor_fields   에디터 전용 필드 배열 (addslashes 대신 stripslashes 저장)
- *
- * @return string                SQL SET 구문 문자열
- *
- * $sql = "INSERT INTO {$table} SET\n" . build_query($set);
- */
-function build_query(
-    array $data,
-    array $editor_fields = array()
-):string {
-    $set = array();
+$g5['title'] = $w === 'u' ? '배너 수정' : '배너 입력';
 
-    foreach ($data as $key => $value) {
-        if (is_null($value)) {
-            $set[] = "{$key} = NULL";
-        } elseif (is_numeric($value) && !preg_match('/^0[0-9]+$/', $value)) {
-            $set[] = "{$key} = {$value}";
-        } elseif (in_array($key, $editor_fields, true)) {
-            // 에디터 전용 필드 → stripslashes 후 그대로 저장
-            $clean_value = stripslashes($value);
-            $set[] = "{$key} = '{$clean_value}'";
-        } else {
-            // 일반 텍스트 → escape 처리
-            $escaped_value = addslashes($value);
-            $set[] = "{$key} = '{$escaped_value}'";
-        }
-    }
-    return implode(",\n", $set);
+$target_table = $g5['write_prefix'] . $bo_table;
+
+if ($w === 'u') {
+    $sql = "SELECT * FROM {$target_table} WHERE wr_id = '{$wr_id}' ";
+    $banner = sql_fetch($sql);
+    $file_data = get_file($bo_table, $wr_id);
 }
 
-/**
- * 파일 업로드 입력창 HTML 생성
- *
- * @param string $bo_table       게시판 테이블명 (기존 파일 미리보기 경로용)
- * @param array  $files          기존 업로드된 파일 배열 (get_file() 결과 등)
- * @param string $name           input name 속성명 (기본: bf_file[])
- * @param string $id             input id 속성명 (기본: file_input)
- * @param bool   $image_only     이미지 또는 파일 업로드 (기본 : true)
- * @param bool   $multiple       다중 업로드 허용 여부 (기본: true)
- * @param bool   $include_style  CSS 포함 여부 (기본: true) *
- * @return string                파일 업로드 HTML 마크업 *
- */
-function file_upload_html(
-    string $bo_table = '',
-    array $files = array(),
-    string $name = 'bf_file[]',
-    string $id = 'file_input',
-    bool $image_only = false,
-    bool $multiple = true,
-    bool $include_style = true
-):string {
-    ob_start(); ?>
+?>
 
-    <?php if($include_style): ?>
-        <style>
-            .file_upload_wrapper {display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;}
-            .file_upload_box {padding: 3px; width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
-                display: flex; align-items: center; justify-content: center;
-                position: relative; overflow: hidden; background: #f9f9f9;}
-            .file_upload_box img {width: 100%; height: 100%; object-fit: cover;}
-            .file_upload_box.add_box {cursor: pointer;}
-            .file_upload_box.add_box label {position: relative;}
-            .file_upload_box.add_box label span {position: absolute; top: 50%; left: 50%;
-                transform: translate(-50%, -60%); font-size: 48px;
-                user-select: none; cursor: pointer;}
-            .file_upload_box input[type=file] {display: none;}
-            .remove_btn {position: absolute; top: 3px; right: 3px; padding-bottom: 5px;
-                background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%;
-                width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 18px;
-                text-align: center;}
-            #existing_files, #preview_container {display: flex; gap: 10px; flex-wrap: wrap;}
-        </style>
-    <?php endif; ?>
+<?php include_once(G5_ADMIN_PATH.'/admin.head.php'); ?>
 
-    <div class="file_upload_wrapper">
-        <!-- 새 파일 추가 버튼 -->
-        <div class="file_upload_box add_box">
-            <label for="<?= $id ?>"><span>+</span></label>
-            <input type="file" name="<?=$name ?>" id="<?= $id ?>" <?= $multiple ? 'multiple' : '' ?> <?= $image_only ? 'accept="image/*"' : '' ?>>
-        </div>
+<form name="fbanner" id="fbanner" action="./banner_form_update.php" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="bo_table" value="<?= $bo_table ?>">
+    <input type="hidden" name="wr_id" value="<?= $wr_id ?>">
+    <input type="hidden" name="w" value="<?= $w ?>">
 
-        <!-- 기존 파일 영역 -->
-        <div id="existing_files" style="display: flex; gap: .5rem;">
-            <?php if (!empty($files)): ?>
-                <?php foreach ($files as $file): ?>
-                    <div class="file_upload_box">
-                        <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['bf_file'] ?>" alt="<?= $file['bf_source'] ?>">
-                        <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?>">X</button>
-                        <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?>">
-                    </div>
-                <?php endforeach; ?>
+    <div class="tbl_frm01 tbl_wrap">
+        <table>
+            <colgroup>
+                <col class="grid_3">
+                <col>
+            </colgroup>
+            <tbody>
+            <tr>
+                <th scope="row"><label for="wr_subject">제목</label></th>
+                <td>
+                    <input type="text" name="wr_subject" id="wr_subject" value="<?= get_text($banner['wr_subject'] ?? '') ?>" required class="frm_input" size="60">
+                </td>
+            </tr>
+
+            <tr>
+                <th scope="row"><label for="bn_title">시작일</label></th>
+                <td>
+                    <input type="date" name="bn_title" id="bn_title" value="<?= $banner['wr_start'] ?? '' ?>" required class="frm_input">
+                </td>
+            </tr>
+
+            <tr>
+                <th scope="row"><label for="bn_link">종료일</label></th>
+                <td>
+                    <input type="date" name="bn_link" id="bn_link" value="<?= $banner['wr_end'] ?? '' ?>" class="frm_input">
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="bn_title">이미지 첨부</label></th>
+                <td>
+                    <?= file_upload_html($bo_table, $file_data ?? array()) ?>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="bn_title">등록일</label></th>
+                <td>
+                    <input type="text" name="bn_title" id="bn_title" value="<?= get_text($banner['bn_title'] ?? '') ?>" required class="frm_input" size="60">
+                </td>
+            </tr>
+
+            <tr>
+                <th scope="row">사용 여부</th>
+                <td>
+                    <?php $bn_use = $banner['bn_use'] ?? '1'; ?>
+                    <label><input type="radio" name="bn_use" value="1" <?= $bn_use == '1' ? 'checked' : '' ?>> 사용</label>
+                    <label style="margin-left:15px;"><input type="radio" name="bn_use" value="0" <?= $bn_use == '0' ? 'checked' : '' ?>> 중지</label>
+                </td>
+            </tr>
+
+            <?php if ($bn_id): ?>
+                <tr>
+                    <th scope="row">등록일</th>
+                    <td><?= $banner['bn_datetime'] ?></td>
+                </tr>
             <?php endif; ?>
-        </div>
-
-        <!-- 새 파일 preview -->
-        <div id="preview_container"></div>
+            </tbody>
+        </table>
     </div>
 
-    <?php return ob_get_clean();
-}
+    <div class="btn_fixed_top">
+        <input type="submit" value="저장" class="btn btn_submit">
+        <a href="./banner_list.php" class="btn btn_02">목록</a>
+    </div>
+</form>
 
-/**
- * 파일 업로드 미리보기 및 삭제 기능용 JavaScript 반환
- *
- * @param string $id            파일 input 요소의 id (기본: file_input)
- * @param string $preview_id    미리보기 컨테이너 id (기본: preview_container)
- *
- * @return string               JavaScript 코드 (script 태그 제외)
- *
- */
-function get_file_upload_js(
-    string $id = 'file_input',
-    string $preview_id = 'preview_container'
-): string {
-    ob_start(); ?>
-    <script>
-        $(document).on('change', '#<?= $id ?>', function(){
-            const $original_input = $(this);
-            const files = this.files;
-            if (!files.length) return;
-
-            // 다음 파일 선택을 위해 다시 이벤트를 받을 input
-            const $next_file_input  = $original_input.clone().val('');
-
-            // ID 제거
-            $original_input.removeAttr('id');
-
-            $.each(files, function(i, file){
-                const ext = file.name.split('.').pop().toLowerCase();
-                const $box = $('<div>', { class: 'file_upload_box' });
-                const $remove_btn = $('<button>', { class: 'remove_btn', text: 'X' });
-
-                // 이미지 미리보기 생성
-                if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
-                    const reader = new FileReader();
-                    reader.onload = function(e){
-                        const $img = $('<img>', { src: e.target.result });
-                        $box.append($img);
-                    };
-                    reader.readAsDataURL(file);
-
-                } else {
-                    const $file_info = $('<div>', { class: 'file-info' }).append(`<p><span>${file.name}</span></p>`);
-                    $box.append($file_info);
-                }
-
-                // 박스 생성
-                $box.append($original_input);
-                $box.append($remove_btn);
-
-                // 미리보기 영역에 추가
-                $('#<?= $preview_id ?>').append($box);
-            });
-
-            // 다음 선택을 위한 빈 input 다시 등록
-            $next_file_input.attr('id', '<?= $id ?>');
-            $('.add_box').append($next_file_input);
-        });
-
-        // 삭제 버튼 클릭 시 input + 박스 제거
-        $(document).on('click', '.remove_btn', function(){
-            $(this).closest('.file_upload_box').remove();
-        });
-    </script>
-    <?php
-    $html = ob_get_clean();
-    return str_replace(['<script>', '</script>'], '', $html);
-}
-
-/**
- * 파일 첨부 처리
- *
- * @param array  $files (기본 : $_FILES['bf_file'])
- * @param string $bo_table 게시판 테이블명
- * @param int    $wr_id 글 고유 아이디
- * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
- *
- * @return bool  파일 업로드 성공여부
- **/
-function attach_file(
-    array $files,
-    string $bo_table,
-    int $wr_id,
-    string $upload_dir = ''
-): bool {
-    global $g5;
-
-    $upload_dir = $upload_dir ?: G5_DATA_PATH . "/file/{$bo_table}";
-
-    if (!is_dir($upload_dir)) {
-        @mkdir($upload_dir, G5_DIR_PERMISSION, true);
-        @chmod($upload_dir, G5_DIR_PERMISSION);
-    }
-
-    // 파일이 없어도 return true
-    if (!isset($files['name']) || !is_array($files['name'])) {
-        return true;
-    }
-
-    // 현재 wr_id에서 가장 큰 bf_no 조회, 다음 번호부터 생성
-    $sql = "SELECT MAX(bf_no) AS max_bf_no FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
-    $row = sql_fetch($sql);
-    $bf_cursor = is_null($row['max_bf_no']) ? 0 : (int)$row['max_bf_no'] + 1;
-
-    for ($i = 0; $i < count($files['name']); $i++) {
-        if ($files['error'][$i] !== UPLOAD_ERR_OK || !$files['name'][$i]) continue;
-
-        //확장자 검사
-        $original_name = $files['name'][$i];
-        $ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
-
-        $deny_ext = array('php', 'phar', 'exe', 'sh', 'js');
-        if (in_array($ext, $deny_ext)) {
-            alert("허용되지 않는 파일 형식입니다. ({$ext})");
-        }
-
-        // 파일명 생성
-        $new_name = date('YmdHis') . '_' . md5(uniqid('', true)) . '.' . $ext;
-        $dest_path = "{$upload_dir}/{$new_name}";
-
-        //파일 이동
-        if (!move_uploaded_file($files['tmp_name'][$i], $dest_path)) {
-            return false;
-        }
-
-        @chmod($dest_path, G5_FILE_PERMISSION);
-
-        //이미지 정보
-        $bf_width = 0;
-        $bf_height = 0;
-        $img_info = getimagesize($dest_path);
-        if ($img_info) {
-            $bf_width = $img_info[0];
-            $bf_height = $img_info[1];
-        }
-
-        //DB 저장
-        $bf_source = sql_real_escape_string($original_name);
-        $bf_file = sql_real_escape_string($new_name);
-        $bf_filesize = (int)$files['size'][$i];
-
-        $sql = "
-            INSERT INTO {$g5['board_file_table']}
-            SET bo_table    = '{$bo_table}',
-                wr_id       = '{$wr_id}',
-                bf_no       = '{$bf_cursor}',
-                bf_source   = '{$bf_source}',
-                bf_file     = '{$bf_file}',
-                bf_content  = '',
-                bf_filesize = '{$bf_filesize}',
-                bf_width    = '{$bf_width}',
-                bf_height   = '{$bf_height}',
-                bf_datetime = NOW()
-        ";
-        $insert = sql_query($sql);
-
-        if (!$insert) {
-            @unlink($dest_path);
-            return false;
-        }
-        $bf_cursor++;
-    }
-
-    return true;
-}
-
-/**
- * 게시물에 연결된 첨부파일을 삭제
- *
- * @param string $bo_table   게시판 테이블명
- * @param int    $wr_id      글 고유 ID
- * @param int|null $bf_no    첨부파일 중 일부만 삭제할 때 사용
- * @param string $upload_dir 업로드 경로 (기본: /data/file/{bo_table})
- *
- * @return bool              성공 여부 (삭제할 파일이 없어도 true)
- */
-function delete_attach_file(
-    string $bo_table,
-    int $wr_id,
-    ?int $bf_no = null,
-    string $upload_dir = ''
-):bool {
-    global $g5;
-
-    if (!$bo_table || !$wr_id) return false;
-
-    $upload_dir = $upload_dir ?: G5_DATA_PATH . "/file/{$bo_table}";
-    $bf_sql = is_null($bf_no) ? "" : " AND bf_no = '{$bf_no}' ";
-
-    $sql_select  = "SELECT * FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' {$bf_sql} ";
-    $result = sql_query($sql_select);
-    while ($file = sql_fetch_array($result)) {
-        $file_path = "{$upload_dir}/{$file['bf_file']}";
-
-        if (is_file($file_path)) {
-            @unlink($file_path);
-        }
-    }
-    // DB 삭제
-    $sql_delete = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' {$bf_sql}  ";
-    $delete = sql_query($sql_delete);
-
-    if (!$delete) return false;
-
-    return true;
-}
+<?php include_once(G5_ADMIN_PATH.'/admin.tail.php'); ?>
