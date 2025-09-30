@@ -7,16 +7,8 @@ $bo_table = 'landing';
 if (!$ld_page) alert('잘못된 접근입니다.');
 
 if($w === 'd'){
-    //파일 삭제
-    $sql = "SELECT bf_file FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
-    $result = sql_query($sql);
-    while ($row = mysqli_fetch_array($result)) {
-        $file_path = G5_DATA_PATH.'/file/'.$bo_table.'/'.$row['bf_file'];
-        if (is_file($file_path)) @unlink($file_path);
-    }
-    //db 삭제
-    $sql = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
-    sql_query($sql);
+    //파일, db 삭제
+    delete_attach_file($bo_table, $ld_id);
 
     //랜딩페이지 삭제
     $sql = "DELETE FROM {$g5['landing']} WHERE ld_id = '{$ld_id}' AND ld_page = '{$ld_page}' ";
