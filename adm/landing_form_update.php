@@ -1,19 +1,7 @@
 <?php
 include_once('./_common.php');
 
-/*
-echo '<pre>';
-print_r($_POST);
-echo '<pre>';
-exit;
-*/
-
-//$bo_table = 'landing';
-
-$upload_dir = G5_DATA_PATH.'/file/'.$bo_table;
-@mkdir($upload_dir, G5_DIR_PERMISSION, true);
-
-$file = $_FILES['bf_file'] ?? null;
+$files = $_FILES['bf_file'] ?? null;
 
 if($w === ''){
     //입력
@@ -32,50 +20,17 @@ if($w === ''){
         "ld_datetime"      => date('Y-m-d H:i'),
     );
 
-    $sql = "INSERT INTO {$g5['landing']} SET\n".build_query($set, ['ld_content']);
+    $sql = "INSERT INTO {$g5['landing']} SET\n".build_query($set);
     $insert = sql_query($sql);
+    if (!$insert) alert('데이터 추가에 실패했습니다.');
+
     $ld_id = sql_insert_id();
 
-    if($file &&  is_array($file['name'])){
-        $cnt = count($file['name']);
-
-        for ($i = 0; $i < $cnt; $i++){
-            if($file['error'][$i] !== UPLOAD_ERR_OK) continue;
-
-            //확장자
-            $ext = pathinfo($file['name'][$i], PATHINFO_EXTENSION);
-
-            //파일명
-            $new_file = md5(uniqid('', true)).'.'.$ext;
-            $dest = $upload_dir.'/'.$new_file;
-
-            //업로드 이동
-            if(move_uploaded_file($file['tmp_name'][$i], $dest)){
-                @chmod($dest, G5_FILE_PERMISSION);
-
-                //DB
-                $source = sql_real_escape_string($file['name'][$i]);
-                $size = $file['size'][$i];
-
-                $set = array(
-                    "bo_table"    => $bo_table,
-                    "wr_id"       => $ld_id,
-                    "bf_no"       => $i,
-                    "bf_source"   => $source,
-                    "bf_file"     => $new_file,
-                    "bf_download" => 0,
-                    "bf_content"  => '',
-                    "bf_filesize" => $size,
-                    "bf_type"     => preg_match('/\.(jpg|jpeg|png|gif)$/i',$ext)? 1:0,
-                    "bf_datetime" => G5_TIME_YMDHIS
-                );
-                $sql = "INSERT INTO {$g5['board_file_table']} SET\n".build_query($set);
-                sql_query($sql);
-
-            }
-        }
+    if (!attach_file($files, $bo_table, $ld_id)){
+        alert("파일 업로드에 실패하였습니다.");
+    }else{
+        goto_url("./landing_list.php");
     }
-    goto_url("./landing_list.php");
 
 }else{
     //수정
@@ -96,72 +51,29 @@ if($w === ''){
         "ld_datetime"      => date('Y-m-d H:i'),
     );
 
-    $sql = "UPDATE {$g5['landing']} SET\n".build_query($set, ['ld_content']);
-    $insert = sql_query($sql);
-
-    //ld_id
-    $row = sql_fetch("SELECT ld_id FROM {$g5['landing']} WHERE ld_page = '{$ld_page}' ");
-    $ld_id = $row['ld_id'];
+    $sql = "UPDATE {$g5['landing']} SET\n" . build_query($set) . "\nWHERE ld_id = '{$ld_id}' ";
+    $update = sql_query($sql);
+    if (!$update) alert('데이터 업데이트에 실패했습니다.');
 
     //삭제요청 파일 삭제 처리
     $keep_file = $_POST['keep_file'] ?? array();
     $keep_file = array_map('intval', (array)$keep_file);
 
-    $sql = "SELECT bf_no, bf_file FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
+    //첨부파일 전체
+    $sql = "SELECT bf_no FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
     $result = sql_query($sql);
+    //삭제요청 파일 삭제
     while ($row = sql_fetch_array($result)) {
         if (!in_array((int)$row['bf_no'], $keep_file, true)) {
-            // DB 삭제
-            $sql = "DELETE FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' AND bf_no = '{$row['bf_no']}'";
-            sql_query($sql);
-
-            // 파일 삭제
-            if ($row['bf_file'] && file_exists($upload_dir.'/'.$row['bf_file'])) {
-                @unlink($upload_dir.'/'.$row['bf_file']);
-            }
+            // DB 삭제, 파일 삭제
+            delete_attach_file($bo_table, $ld_id, $row['bf_no']);
         }
     }
 
-    //bf_no 최대값 구하기
-    $sql = "SELECT COALESCE(MAX(bf_no), -1) AS max_bf_no FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$ld_id}' ";
-    $row = sql_fetch($sql);
-    $next_bf_no = ((int)$row['max_bf_no']) + 1;
-
-    //세로운 파일 업로드
-    if ($file && is_array($file['name'])) {
-        $cnt = count($file['name']);
-        for ($i = 0; $i < $cnt; $i++) {
-            if ($file['error'][$i] !== UPLOAD_ERR_OK) continue;
-
-            $ext = pathinfo($file['name'][$i], PATHINFO_EXTENSION);
-            $new_file = md5(uniqid('', true)).'.'.$ext;
-            $dest = $upload_dir.'/'.$new_file;
-
-            if (move_uploaded_file($file['tmp_name'][$i], $dest)) {
-                @chmod($dest, G5_FILE_PERMISSION);
-
-                $source = sql_real_escape_string($file['name'][$i]);
-                $size = $file['size'][$i];
-                $is_img = preg_match('/\.(jpg|jpeg|png|gif)$/i', $ext) ? 1 : 0;
-
-                //저장
-                $set = array(
-                    "bo_table"    => $bo_table,
-                    "wr_id"       => $ld_id,
-                    "bf_no"       => $next_bf_no++,
-                    "bf_source"   => $source,
-                    "bf_file"     => $new_file,
-                    "bf_download" => 0,
-                    "bf_content"  => '',
-                    "bf_filesize" => $size,
-                    "bf_type"     => $is_img,
-                    "bf_datetime" => G5_TIME_YMDHIS
-                );
-                $sql = "INSERT INTO {$g5['board_file_table']} SET\n".build_query($set);
-                sql_query($sql);
-            }
-        }
+    //새로운 파일 업로드
+    if (!attach_file($files, $bo_table, $ld_id)){
+        alert("파일 업로드에 실패하였1습니다.");
+    }else{
+        goto_url("./landing_form.php?w=u&ld_page={$ld_page}");
     }
-    goto_url("./landing_form.php?w=u&ld_page={$ld_page}");
-
 }
