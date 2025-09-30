@@ -72,8 +72,9 @@ if($w === ''){
 
     //새로운 파일 업로드
     if (!attach_file($files, $bo_table, $ld_id)){
-        alert("파일 업로드에 실패하였1습니다.");
+        alert("파일 수정 업로드에 실패하였습니다.");
     }else{
         goto_url("./landing_form.php?w=u&ld_page={$ld_page}");
     }
 }
+
