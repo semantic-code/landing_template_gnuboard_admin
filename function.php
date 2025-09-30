@@ -122,40 +122,51 @@ function get_file_upload_js(
     ob_start(); ?>
     <script>
         $(document).on('change', '#<?= $id ?>', function(){
+            const $original_input = $(this);
             const files = this.files;
             if (!files.length) return;
 
-            $('#<?= $preview_id ?>').empty();
+            // 다음 파일 선택을 위해 다시 이벤트를 받을 input
+            const $next_file_input  = $original_input.clone().val('');
+
+            // ID 제거
+            $original_input.removeAttr('id');
 
             $.each(files, function(i, file){
                 const ext = file.name.split('.').pop().toLowerCase();
-                const $box = $('<div>', {class : 'file_upload_box'});
-                const $remove_btn = $('<button>', {class : 'remove_btn', text : 'X'});
+                const $box = $('<div>', { class: 'file_upload_box' });
+                const $remove_btn = $('<button>', { class: 'remove_btn', text: 'X' });
 
-                if (['jpg', 'jpeg', 'png', 'gif', 'wenp'].includes(ext)) {
+                // 이미지 미리보기 생성
+                if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
                     const reader = new FileReader();
                     reader.onload = function(e){
-                        const $img = $('<img>', {src : e.target.result});
-
-                        $box.append($img).append($remove_btn);
-                        $('#<?= $preview_id ?>').append($box);
+                        const $img = $('<img>', { src: e.target.result });
+                        $box.append($img);
                     };
                     reader.readAsDataURL(file);
 
-                }else {
-                    const $file_info = $('<div>', {class: 'file-info'})
-                        .append(`<p><span>${file.name}</span></p>`);
-                    $box.append($file_info).append($remove_btn);
-                    $('#<?= $preview_id ?>').append($box);
+                } else {
+                    const $file_info = $('<div>', { class: 'file-info' }).append(`<p><span>${file.name}</span></p>`);
+                    $box.append($file_info);
                 }
+
+                // 박스 생성
+                $box.append($original_input);
+                $box.append($remove_btn);
+
+                // 미리보기 영역에 추가
+                $('#<?= $preview_id ?>').append($box);
             });
+
+            // 다음 선택을 위한 빈 input 다시 등록
+            $next_file_input.attr('id', '<?= $id ?>');
+            $('.add_box').append($next_file_input);
         });
 
-        // 삭제 버튼
+        // 삭제 버튼 클릭 시 input + 박스 제거
         $(document).on('click', '.remove_btn', function(){
-            const $box = $(this).closest('.file_upload_box');
-            $box.find('input[name="keep_file[]"]').remove();
-            $box.remove();
+            $(this).closest('.file_upload_box').remove();
         });
     </script>
     <?php
@@ -188,9 +199,15 @@ function attach_file(
         @chmod($upload_dir, G5_DIR_PERMISSION);
     }
 
+    // 파일이 없어도 return true
     if (!isset($files['name']) || !is_array($files['name'])) {
         return true;
     }
+
+    // 현재 wr_id에서 가장 큰 bf_no 조회, 다음 번호부터 생성
+    $sql = "SELECT MAX(bf_no) AS max_bf_no FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
+    $row = sql_fetch($sql);
+    $bf_cursor = is_null($row['max_bf_no']) ? 0 : (int)$row['max_bf_no'] + 1;
 
     for ($i = 0; $i < count($files['name']); $i++) {
         if ($files['error'][$i] !== UPLOAD_ERR_OK || !$files['name'][$i]) continue;
@@ -204,7 +221,7 @@ function attach_file(
             alert("허용되지 않는 파일 형식입니다. ({$ext})");
         }
 
-        //파일명 생성
+        // 파일명 생성
         $new_name = date('YmdHis') . '_' . md5(uniqid('', true)) . '.' . $ext;
         $dest_path = "{$upload_dir}/{$new_name}";
 
@@ -233,7 +250,7 @@ function attach_file(
             INSERT INTO {$g5['board_file_table']}
             SET bo_table    = '{$bo_table}',
                 wr_id       = '{$wr_id}',
-                bf_no       = '{$i}',
+                bf_no       = '{$bf_cursor}',
                 bf_source   = '{$bf_source}',
                 bf_file     = '{$bf_file}',
                 bf_content  = '',
@@ -244,7 +261,11 @@ function attach_file(
         ";
         $insert = sql_query($sql);
 
-        if (!$insert) return false;
+        if (!$insert) {
+            @unlink($dest_path);
+            return false;
+        }
+        $bf_cursor++;
     }
 
     return true;
