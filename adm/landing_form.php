@@ -46,6 +46,7 @@ echo "</pre>";
 
 <form name="frmLanding" id="frmLanding" action="./landing_form_update.php" method="post" enctype="multipart/form-data" onsubmit="return on_submit(this)">
     <input type="hidden" name="bo_table" value="landing">
+    <input type="hidden" name="ld_id" value="<?= $landing['ld_id'] ?>">
     <input type="hidden" name="ld_page" value="<?php echo $landing['ld_page'] ?? ''; ?>">
     <input type="hidden" name="w" value="<?= $w ?>">
     <input type="hidden" name="chk_ld_page" value="1">
@@ -66,7 +67,7 @@ echo "</pre>";
             <tr>
                 <th scope="row"><label for="ld_page">랜딩 ID</label></th>
                 <td>
-                    <input type="text" name="ld_page" id="ld_page" value="<?php echo $landing['ld_page'] ?? ''; ?>" required class="frm_input" size="30" >
+                    <input type="text" name="ld_page" id="ld_page" class="frm_input" value="<?php echo $landing['ld_page'] ?? ''; ?>" required <?= $w === 'u' ? 'disabled' : '' ?> size="30" >
                     <?php if($w !== 'u'): ?>
                         <button type="button" class="btn btn_02" id="btn_id_check" style="margin-left: .5rem;">중복확인</button>
                     <?php endif; ?>
@@ -145,7 +146,9 @@ echo "</pre>";
 </form>
 
 <script>
+    //중복확인 버튼
     var $target = $("input[name='chk_ld_page']");
+    
     function on_submit(f){
         if(Number($target.val()) === 0){
             alert('랜딩 아이디 중복확인이 필요합니다.');
@@ -176,10 +179,12 @@ echo "</pre>";
                 }
             }, 'json');
         });
-    });
 
+        $(document).on('change',  '#ld_page', function(){
+            $target.val(0);           
+        });
+    });
 </script>
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
-
