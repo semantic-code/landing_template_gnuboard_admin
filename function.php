@@ -88,7 +88,7 @@ function file_upload_html(
 
         <!-- 기존 파일 영역 -->
         <div id="existing_files" style="display: flex; gap: .5rem;">
-            <?php if (!empty($files) && (!isset($files['count']) || $files['count'] > 0)): ?>
+            <?php if (!empty($files)): ?>
                 <?php foreach ($files as $file): ?>
                     <?php $ext = strtolower(pathinfo($file['bf_file'], PATHINFO_EXTENSION)); ?>
                     <?php $is_image = in_array($ext, array('jpg','jpeg','png','gif','webp')); ?>
