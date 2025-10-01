@@ -61,7 +61,7 @@ function file_upload_html(
     <?php if($include_style): ?>
         <style>
             .file_upload_wrapper {display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;}
-            .file_upload_box {padding: 3px; width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
+            .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
             .file_upload_box img {width: 100%; height: 100%; object-fit: cover;}
