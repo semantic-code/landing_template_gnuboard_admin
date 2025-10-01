@@ -16,7 +16,7 @@ if($w === ''){
         "ld_files"         => $ld_files,
         "ld_access_id"     => $ld_access_id,
         "ld_sort_field"    => $ld_sort_field,
-        "ld_use"           => $ld_use,
+        "ld_use"           => $ld_use ?? 0,
         "ld_datetime"      => date('Y-m-d H:i'),
     );
 
@@ -52,7 +52,7 @@ if($w === ''){
         "ld_files"         => $ld_files,
         "ld_access_id"     => $ld_access_id,
         "ld_sort_field"    => $ld_sort_field,
-        "ld_use"           => $ld_use,
+        "ld_use"           => $ld_use ?? 0,
         "ld_datetime"      => date('Y-m-d H:i'),
     );
 
@@ -80,4 +80,5 @@ if($w === ''){
         alert('데이터 저장에 실패했습니다.');
     }
 }
+
 
