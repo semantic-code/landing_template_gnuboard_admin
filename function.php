@@ -38,8 +38,8 @@ function build_query(
 /**
  * 파일 업로드 입력창 HTML 생성
  *
- * @param string $bo_table       게시판 테이블명 또는 g5_board_file의 wr_id
- * @param array  $files          파일 정보 배열 (g5_board_file의 값)
+ * @param string $bo_table       게시판 테이블명 (기존 파일 미리보기 경로용)
+ * @param array  $files          기존 업로드된 파일 배열 (get_file() 결과 등)
  * @param string $name           input name 속성명 (기본: bf_file[])
  * @param string $id             input id 속성명 (기본: file_input)
  * @param bool   $image_only     이미지 또는 파일 업로드 (기본 : true)
@@ -90,17 +90,11 @@ function file_upload_html(
         <div id="existing_files" style="display: flex; gap: .5rem;">
             <?php if (!empty($files)): ?>
                 <?php foreach ($files as $file): ?>
-                <?php $ext = strtolower(pathinfo($file['bf_file'], PATHINFO_EXTENSION)); ?>
-                <?php $is_image = in_array($ext, array('jpg','jpeg','png','gif','webp')); ?>
-                <div class="file_upload_box">
-                    <?php if ($is_image): ?>
-                    <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['bf_file'] ?>" alt="<?= $file['bf_source'] ?>">
-                    <?php else: ?>
-                    <p><span><?= htmlspecialchars($file['bf_source']) ?></span></p>
-                    <?php endif; ?>
-                    <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?>">X</button>
-                    <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?>">
-                </div>
+                    <div class="file_upload_box">
+                        <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['file'] ?? $file['bf_file'] ?>" alt="<?= $file['bf_source'] ?>">
+                        <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?>">X</button>
+                        <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?>">
+                    </div>
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
@@ -132,46 +126,50 @@ function get_file_upload_js(
             const files = this.files;
             if (!files.length) return;
 
-            // 다음 파일 선택을 위해 다시 이벤트를 받을 input
+            // 다음 선택용 input 생성
             const $next_file_input  = $original_input.clone().val('');
 
-            // ID 제거
-            $original_input.removeAttr('id');
+            $next_file_input.removeAttr('name');
+
+            // 고유 ID 생성 (파일마다 고유값)
+            const fileId = Date.now();
+
+            // 원본 input에 data-id 부여
+            $original_input.attr('data-file-id', fileId);
 
             $.each(files, function(i, file){
                 const ext = file.name.split('.').pop().toLowerCase();
-                const $box = $('<div>', { class: 'file_upload_box' });
+                const $box = $('<div>', { class: 'file_upload_box', 'data-file-id': fileId });
                 const $remove_btn = $('<button>', { class: 'remove_btn', text: 'X' });
 
-                // 이미지 미리보기 생성
+                // 이미지 미리보기
                 if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
                     const reader = new FileReader();
                     reader.onload = function(e){
-                        const $img = $('<img>', { src: e.target.result });
-                        $box.append($img);
+                        $box.append($('<img>', { src: e.target.result }));
                     };
                     reader.readAsDataURL(file);
-
                 } else {
-                    const $file_info = $('<div>', { class: 'file-info' }).append(`<p style="padding: 3px;"><span>${file.name}</span></p>`);
-                    $box.append($file_info);
+                    $box.append(`<div class="file-info"><p style="padding:3px;"><span>${file.name}</span></p></div>`);
                 }
 
-                // 박스 생성
-                $box.append($original_input);
-                $box.append($remove_btn);
+                // 여기서 $original_input 은 박스 안에 넣지 않음
+                // $box.append($original_input); ← 삭제!
 
-                // 미리보기 영역에 추가
+                $box.append($remove_btn);
                 $('#<?= $preview_id ?>').append($box);
             });
 
-            // 다음 선택을 위한 빈 input 다시 등록
+            // 새 input 다시 등록
             $next_file_input.attr('id', '<?= $id ?>');
             $('.add_box').append($next_file_input);
         });
 
         // 삭제 버튼 클릭 시 input + 박스 제거
         $(document).on('click', '.remove_btn', function(){
+            const fileId = $(this).closest('.file_upload_box').data('file-id');
+            $('input[type="file"][data-file-id="'+fileId+'"]').remove()
+
             $(this).closest('.file_upload_box').remove();
         });
     </script>
@@ -197,6 +195,11 @@ function attach_file(
     string $upload_dir = ''
 ): bool {
     global $g5;
+
+    if (empty($wr_id)) {
+        alert('파일 업로드에 필요한 wr_id 값이 없습니다.');
+        return false;
+    }
 
     $upload_dir = $upload_dir ?: G5_DATA_PATH . "/file/{$bo_table}";
 
