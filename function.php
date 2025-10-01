@@ -38,7 +38,7 @@ function build_query(
 /**
  * 파일 업로드 입력창 HTML 생성
  *
- * @param string $bo_table       게시판 테이블명
+ * @param string $bo_table       게시판 테이블명 또는 g5_board_file 의 wr_id 칼럼
  * @param array  $files          기존 업로드된 파일 배열 (get_file() 결과 등)
  * @param string $name           input name 속성명 (기본: bf_file[])
  * @param string $id             input id 속성명 (기본: file_input)
