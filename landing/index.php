@@ -22,7 +22,7 @@ $is_use = $row['ld_use'];
 <?php ob_start() ;?>
     <div class="landing-wrap">
         <h1>Default Landing Page</h1>
-        <p>기본 랜딩페이지입니다.</p>
+        <p>기본 랜딩페이지 입니다.</p>
         <p>랜딩페이지 파일이 없습니다.</p>    
         <?php if($is_admin === 'super'):?>
             <p>랜딩페이지 스킨을 생성하지 않은 경우, 스킨 생성을 먼저 하십시오.</p>
@@ -91,4 +91,5 @@ add_stylesheet('<link rel="stylesheet" href="'.$skin_url.'/style.css">', 0);
 
 // 출력
 include $skin_path.'/landing.skin.php';
+
 
