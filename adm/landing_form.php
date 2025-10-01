@@ -73,7 +73,7 @@ echo "</pre>";
                         <button type="button" class="btn btn_02" id="btn_id_check" style="margin-left: .5rem;">중복확인</button>
                     <?php endif; ?>
                     <span class="frm_info">URL 식별자 (예: landing.php?ld_page=여기에 필요한 값, 'basic' 제외)</span>
-                    <span class="frm_info">이미 저장된 아이디는 수정할 수 없습니다.</span>
+                    <span class="frm_info">저장된 아이디는 수정할 수 없습니다.</span>
                 </td>
             </tr>
             <tr>
@@ -188,3 +188,4 @@ echo "</pre>";
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
