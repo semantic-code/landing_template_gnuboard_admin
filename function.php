@@ -64,7 +64,7 @@ function file_upload_html(
             .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
-            .file_upload_box img {width: 100%; height: 100%; object-fit: contain;/*cover;*/}
+            .file_upload_box img {width: 100%; height: 100%; object-fit: contain;}
             .file_upload_box.add_box {cursor: pointer;}
             .file_upload_box.add_box label {position: relative;}
             .file_upload_box.add_box label span {position: absolute; top: 50%; left: 50%;
