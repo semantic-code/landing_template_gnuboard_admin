@@ -153,7 +153,7 @@ function get_file_upload_js(
                     reader.readAsDataURL(file);
 
                 } else {
-                    const $file_info = $('<div>', { class: 'file-info' }).append(`<p><span>${file.name}</span></p>`);
+                    const $file_info = $('<div>', { class: 'file-info' }).append(`<p style="padding: 3px;"><span>${file.name}</span></p>`);
                     $box.append($file_info);
                 }
 
