@@ -56,7 +56,7 @@ if($w === ''){
         "ld_datetime"      => date('Y-m-d H:i'),
     );
 
-    $sql = "UPDATE {$g5['landing']} SET\n".build_query($set);
+    $sql = "UPDATE {$g5['landing']} SET\n".build_query($set) . "\nWHERE ld_id = '{$ld_id}' ";
     $update = sql_query($sql);
 
     if ($update) {
@@ -80,3 +80,4 @@ if($w === ''){
         alert('데이터 저장에 실패했습니다.');
     }
 }
+
