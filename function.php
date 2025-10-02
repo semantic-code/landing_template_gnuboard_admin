@@ -60,7 +60,7 @@ function file_upload_html(
 
     <?php if($include_style): ?>
         <style>
-            .file_upload_wrapper {display: flex; gap: 10px; flex-wrap: nowrap; align-items: flex-start;}
+            .file_upload_wrapper {display: flex; gap: .5rem; flex-wrap: nowrap; align-items: flex-start;}
             .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
