@@ -60,11 +60,11 @@ function file_upload_html(
 
     <?php if($include_style): ?>
         <style>
-            .file_upload_wrapper {display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;}
+            .file_upload_wrapper {display: flex; gap: 10px; flex-wrap: nowrap; align-items: flex-start;}
             .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
-            .file_upload_box img {width: 100%; height: 100%; object-fit: contain;}
+            .file_upload_box img {width: 100%; height: 100%; object-fit: cover;}
             .file_upload_box.add_box {cursor: pointer;}
             .file_upload_box.add_box label {position: relative;}
             .file_upload_box.add_box label span {position: absolute; top: 50%; left: 50%;
@@ -83,17 +83,17 @@ function file_upload_html(
         <!-- 새 파일 추가 버튼 -->
         <div class="file_upload_box add_box">
             <label for="<?= $id ?>"><span>+</span></label>
-            <input type="file" name="<?=$name ?>" id="<?= $id ?>" <?= $multiple ? 'multiple' : '' ?> <?= $image_only ? 'accept="image/*"' : '' ?>>
+            <input type="file" name="<?//= $id ?>" id="<?= $id ?>" <?= $multiple ? 'multiple' : '' ?> <?= $image_only ? 'accept="image/*"' : '' ?>>
         </div>
 
         <!-- 기존 파일 영역 -->
         <div id="existing_files" style="display: flex; gap: .5rem;">
             <?php if (!empty($files)): ?>
-                <?php foreach ($files as $file): ?>
+                <?php foreach ($files as $key => $file): ?>
                     <div class="file_upload_box">
-                        <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['file'] ?? $file['bf_file'] ?>" alt="<?= $file['bf_source'] ?>">
-                        <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?>">X</button>
-                        <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?>">
+                        <img src="<?= G5_DATA_URL ?>/file/<?= $bo_table ?>/<?= $file['bf_file'] ?? $file['file'] ?>" alt="<?= $file['bf_source'] ?>">
+                        <button type="button" class="remove_btn" data-bf-no="<?= $file['bf_no'] ?? $key ?>">X</button>
+                        <input type="hidden" name="keep_file[]" value="<?= $file['bf_no'] ?? $key ?>">
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -121,56 +121,53 @@ function get_file_upload_js(
 ): string {
     ob_start(); ?>
     <script>
-        $(document).on('change', '#<?= $id ?>', function(){
-            const $original_input = $(this);
-            const files = this.files;
-            if (!files.length) return;
-
-            // 다음 선택용 input 생성
-            const $next_file_input  = $original_input.clone().val('');
-
-            $next_file_input.removeAttr('name');
-
-            // 고유 ID 생성 (파일마다 고유값)
-            const fileId = Date.now();
-
-            // 원본 input에 data-id 부여
-            $original_input.attr('data-file-id', fileId);
+        $(document).on('change', '#<?= $id ?>', function(e){
+            const files = e.target.files;
+            if(!files.length) return false;
 
             $.each(files, function(i, file){
                 const ext = file.name.split('.').pop().toLowerCase();
-                const $box = $('<div>', { class: 'file_upload_box', 'data-file-id': fileId });
-                const $remove_btn = $('<button>', { class: 'remove_btn', text: 'X' });
 
-                // 이미지 미리보기
-                if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
+                // 새로운 input 생성, DataTransfer
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                const $input = $('<input>', {type: 'file', name: 'bf_file[]'}).prop('files', dt.files);
+
+                // 박스 생성 및 구성
+                const $box = $('<div>', {class: 'file_upload_box new-file'}).append($input);
+                const $remove_btn = $('<button>', {class: 'remove_btn', text: 'X'});
+
+                // 이미지 파일이면 미리 보기
+                if(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
                     const reader = new FileReader();
-                    reader.onload = function(e){
-                        $box.append($('<img>', { src: e.target.result }));
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    $box.append(`<div class="file-info"><p style="padding:3px;"><span>${file.name}</span></p></div>`);
-                }
+                    reader.onload = function(ev) {
+                        $box.append($('<img>', {src: ev.target.result}));
+                    }
+                    reader.readAsDataURL(file)
 
-                // 여기서 $original_input 은 박스 안에 넣지 않음
-                // $box.append($original_input); ← 삭제!
+                } else {
+                    const $file_info  = $('<div>', {class: 'file-info'});
+                    const $p = $('<p>').css('padding', '3px');
+                    const $span = $('<span>').text(file.name);
+
+                    $p.append($span);
+                    $file_info.append($p);
+                    $box.append($file_info);
+                }
 
                 $box.append($remove_btn);
                 $('#<?= $preview_id ?>').append($box);
             });
-
-            // 새 input 다시 등록
-            $next_file_input.attr('id', '<?= $id ?>');
-            $('.add_box').append($next_file_input);
+            $(this).val('');
         });
 
         // 삭제 버튼 클릭 시 input + 박스 제거
         $(document).on('click', '.remove_btn', function(){
-            const fileId = $(this).closest('.file_upload_box').data('file-id');
-            $('input[type="file"][data-file-id="'+fileId+'"]').remove()
-
             $(this).closest('.file_upload_box').remove();
+
+            const $old_input = $('#<?= $id ?>');
+            const $new_input = $old_input.clone().val('');
+            $old_input.replaceWith($new_input);
         });
     </script>
     <?php
