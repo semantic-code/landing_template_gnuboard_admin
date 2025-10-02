@@ -44,9 +44,8 @@ foreach ($arr_field as $row) {
 
         <!-- 상단 배너 -->
         <div class="landing-banner">
-            <?php /** $img_src[0] 1번째 이미지, $img_src[1] 두번째 이미지 **/ ?>
-            <img src="<?= $img_src_1 ?>" alt="이벤트 배너" class="banner-img">
-            <img src="<?= $img_src_2 ?>" alt="이벤트 배너" class="banner-img">
+            <?php /** $img_src_1: 1번째 이미지, $img_src_2: 두번째 이미지... **/ ?>            
+            <img src="<?= $img_src_1 ?>" alt="이벤트 배너" class="banner-img">            
         </div>
 
         <!-- 본문 설명 -->
@@ -104,6 +103,7 @@ foreach ($arr_field as $row) {
 
 <?php
 include_once(G5_PATH.'/tail.sub.php');
+
 
 
 
