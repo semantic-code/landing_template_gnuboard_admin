@@ -60,7 +60,7 @@ function file_upload_html(
 
     <?php if($include_style): ?>
         <style>
-            .file_upload_wrapper {display: flex; gap: .5rem; flex-wrap: nowrap; align-items: flex-start;}
+            .file_upload_wrapper {display: flex; gap: .25rem; flex-wrap: nowrap; align-items: flex-start;}
             .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
@@ -75,7 +75,7 @@ function file_upload_html(
                 background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%;
                 width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 18px;
                 text-align: center;}
-            #existing_files, #preview_container {display: flex; gap: 10px; flex-wrap: wrap;}
+            #existing_files, #preview_container {display: flex; gap: .5rem; flex-wrap: wrap;}
         </style>
     <?php endif; ?>
 
@@ -87,7 +87,7 @@ function file_upload_html(
         </div>
 
         <!-- 기존 파일 영역 -->
-        <div id="existing_files" style="display: flex; gap: .5rem;">
+        <div id="existing_files">
             <?php if (!empty($files)): ?>
                 <?php foreach ($files as $key => $file): ?>
                     <div class="file_upload_box">
