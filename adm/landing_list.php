@@ -110,7 +110,7 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
                     </a>
                 </td>
                 <td><?php echo get_text($row['ld_subject']); ?></td>
-                <td><?php echo $row['ld_use'] === 'Y' ? '사용' : '미사용'; ?></td>
+                <td><?php echo $row['ld_use'] == 1 ? '사용' : '미사용'; ?></td>
                 <td>
                     <?php foreach (explode('|', $row['ld_fields']) as $field): ?>
                     <?php if (trim($field) === '') continue; ?>
@@ -163,5 +163,6 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
 
 
