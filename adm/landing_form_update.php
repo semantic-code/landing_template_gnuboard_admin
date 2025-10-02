@@ -1,7 +1,7 @@
 <?php
 include_once('./_common.php');
 
-$files = $_FILES['bf_file'] ?? null;
+$files = $_FILES['bf_file'] ?? array();
 
 if($w === ''){
     // 입력
@@ -82,6 +82,7 @@ if($w === ''){
         alert('데이터 저장에 실패했습니다.');
     }
 }
+
 
 
 
