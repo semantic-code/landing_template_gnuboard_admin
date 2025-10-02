@@ -22,5 +22,5 @@ if($member['mb_id'] !== 'admin') goto_url('./landing_index.php')
 ```
 - function file_upload_html()
 ```php
-array $files : g5_board_file (WHERE 조건 :bo_table, wr_id) 또는 g5_board_file 테이블 wr_id 결과
+array $files : g5_board_file (WHERE 조건 :bo_table, wr_id) 또는 g5_board_file 테이블 WHERE 조건 wr_id 결과
 ```
