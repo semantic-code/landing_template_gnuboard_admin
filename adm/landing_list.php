@@ -21,8 +21,9 @@ $paging = get_paging($config['cf_write_pages'], $page, $total_page, $_SERVER['PH
 $sql = "SELECT * FROM {$g5['landing']} ORDER BY ld_id DESC LIMIT {$from_record}, {$page_rows}";
 $result = sql_query($sql);
 
-while ($row = sql_fetch_array($result)){$list[] = $row;}
-
+while ($row = sql_fetch_array($result)) {
+    $list[] = $row;
+}
 ?>
 <style>
     .label_cate, .label_field {
@@ -163,6 +164,7 @@ while ($row = sql_fetch_array($result)){$list[] = $row;}
 
 <?php
 include_once(G5_ADMIN_PATH.'/admin.tail.php');
+
 
 
 
