@@ -48,20 +48,22 @@ function build_query(
  * @return string                파일 업로드 HTML 마크업 *
  */
 function file_upload_html(
-    string $bo_table = '',
-    array $files = array(),
-    string $name = 'bf_file[]',
-    string $id = 'file_input',
-    bool $image_only = false,
-    bool $multiple = true,
-    bool $include_style = true
+    string $bo_table      = '',
+    array  $files         = array(),
+    string $name          = 'bf_file[]',
+    string $id            = 'file_input',
+    bool   $image_only    = false,
+    bool   $multiple      = true,
+    bool   $include_style = true,
+    int    $width         = 100,
+    int    $height        = 100,
 ):string {
     ob_start(); ?>
 
     <?php if($include_style): ?>
         <style>
-            .file_upload_wrapper {display: flex; gap: .25rem; flex-wrap: nowrap; align-items: flex-start;}
-            .file_upload_box {width: 100px; height: 100px; border: 2px dashed #ccc; border-radius: 8px;
+            .file_upload_wrapper {display: flex; gap: .5rem; flex-wrap: nowrap; align-items: flex-start;}
+            .file_upload_box {width: <?= $width ?>px; height: <?= $height ?>px; border: 2px dashed #ccc; border-radius: 8px;
                 display: flex; align-items: center; justify-content: center;
                 position: relative; overflow: hidden; background: #f9f9f9;}
             .file_upload_box img {width: 100%; height: 100%; object-fit: cover;}
@@ -75,7 +77,12 @@ function file_upload_html(
                 background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%;
                 width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 18px;
                 text-align: center;}
-            #existing_files, #preview_container {display: flex; gap: .5rem; flex-wrap: wrap;}
+            #existing_files, #preview_container {display: flex; gap: 10px; flex-wrap: wrap;}
+        </style>
+        <style>
+            $().css({
+
+            });
         </style>
     <?php endif; ?>
 
@@ -87,7 +94,7 @@ function file_upload_html(
         </div>
 
         <!-- 기존 파일 영역 -->
-        <div id="existing_files">
+        <div id="existing_files" style="display: flex; gap: .5rem;">
             <?php if (!empty($files)): ?>
                 <?php foreach ($files as $key => $file): ?>
                     <div class="file_upload_box">
@@ -186,9 +193,9 @@ function get_file_upload_js(
  * @return bool  파일 업로드 성공여부
  **/
 function attach_file(
-    array $files,
+    array  $files,
     string $bo_table,
-    int $wr_id,
+    int    $wr_id,
     string $upload_dir = ''
 ): bool {
     global $g5;
@@ -289,8 +296,8 @@ function attach_file(
  */
 function delete_attach_file(
     string $bo_table,
-    int $wr_id,
-    ?int $bf_no = null,
+    int    $wr_id,
+    ?int   $bf_no = null,
     string $upload_dir = ''
 ):bool {
     global $g5;
