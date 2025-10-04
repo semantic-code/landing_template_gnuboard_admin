@@ -78,12 +78,7 @@ function file_upload_html(
                 width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 18px;
                 text-align: center;}
             #existing_files, #preview_container {display: flex; gap: 10px; flex-wrap: wrap;}
-        </style>
-        <style>
-            $().css({
-
-            });
-        </style>
+        </style>   
     <?php endif; ?>
 
     <div class="file_upload_wrapper">
