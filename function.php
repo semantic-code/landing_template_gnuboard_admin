@@ -5,15 +5,15 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
  * 배열 데이터를 SQL SET 구문 형태로 변환
  *
  * @param array $data            입력 데이터 (key => value 형태)
- * @param array $editor_fields   에디터 전용 필드 배열 (addslashes 대신 stripslashes 저장)
+ * @param string $editor_fields   에디터 전용 필드 (addslashes 대신 stripslashes 저장)
  *
  * @return string                SQL SET 구문 문자열
  *
- * $sql = "INSERT INTO {$table} SET\n" . build_query($set);
+ * $sql = "INSERT INTO {$table} SET\n" . build_query($set, 'wr_content');
  */
 function build_query(
     array $data,
-    array $editor_fields = array()
+    string $editor_fields = ''
 ):string {
     $set = array();
 
@@ -22,7 +22,7 @@ function build_query(
             $set[] = "{$key} = NULL";
         } elseif (is_numeric($value) && !preg_match('/^0[0-9]+$/', $value)) {
             $set[] = "{$key} = {$value}";
-        } elseif (in_array($key, $editor_fields, true)) {
+        } elseif ($key === $editor_fields) {
             // 에디터 전용 필드 → stripslashes 후 그대로 저장
             $clean_value = stripslashes($value);
             $set[] = "{$key} = '{$clean_value}'";
