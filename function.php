@@ -36,6 +36,47 @@ function build_query(
 }
 
 /**
+ * 테이블 구조를 분석해, 기본값이 없는 NOT NULL 필드에 자동으로 빈값('')을 채우기 위한 배열 생성
+ *
+ * @param string $table_name  대상 테이블명 (예: g5_write_notice)
+ * @param array  $ignore_cols 무시할 칼럼 (자동 생성되는 wr_id, wr_num 등)
+ * @return array              기본값이 없는 NOT NULL 칼럼 목록
+ */
+function get_empty_fields(string $table_name, array $ignore_cols = []): array {
+    global $g5;
+
+    // 기본 무시 목록 (자동 증가나 시스템 필드)
+    $ignore_defaults = array_merge([
+        'wr_id', 'wr_num', 'wr_parent', 'wr_is_comment',
+        'wr_datetime', 'wr_last', 'wr_ip', 'wr_hit'
+    ], $ignore_cols);
+
+    $fields = [];
+    $sql = "SHOW FULL COLUMNS FROM {$table_name}";
+    $res = sql_query($sql);
+
+    while ($row = sql_fetch_array($res)) {
+        $field = $row['Field'];
+        $default = $row['Default'];
+        $null = strtoupper($row['Null']);
+        $extra = $row['Extra'];
+
+        // 무시대상 제외
+        if (in_array($field, $ignore_defaults)) continue;
+
+        // AUTO_INCREMENT 제외
+        if (stripos($extra, 'auto_increment') !== false) continue;
+
+        // NOT NULL + 기본값 없음 => 빈값 대상
+        if ($null === 'NO' && is_null($default)) {
+            $fields[] = $field;
+        }
+    }
+
+    return $fields;
+}
+
+/**
  * 파일 업로드 입력창 HTML 생성
  *
  * @param string $bo_table       게시판 테이블명 (기존 파일 미리보기 경로용)
