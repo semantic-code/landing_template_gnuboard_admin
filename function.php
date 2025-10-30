@@ -38,11 +38,11 @@ function build_query(
 /**
  * 테이블 구조를 분석해, 기본값이 없는 NOT NULL 필드에 자동으로 빈값('')을 채우기 위한 배열 생성
  *
- * @param string $table_name  대상 테이블명 (예: g5_write_notice)
+ * @param string $target_table  대상 테이블명 (예: g5_write_notice)
  * @param array  $ignore_cols 무시할 칼럼 (자동 생성되는 wr_id, wr_num 등)
  * @return array              기본값이 없는 NOT NULL 칼럼 목록
  */
-function get_empty_fields(string $table_name, array $ignore_cols = []): array {
+function get_empty_fields(string $target_table, array $ignore_cols = []): array {
     global $g5;
 
     // 기본 무시 목록 (자동 증가나 시스템 필드)
@@ -52,7 +52,7 @@ function get_empty_fields(string $table_name, array $ignore_cols = []): array {
     ], $ignore_cols);
 
     $fields = [];
-    $sql = "SHOW FULL COLUMNS FROM {$table_name}";
+    $sql = "SHOW FULL COLUMNS FROM {$target_table}";
     $res = sql_query($sql);
 
     while ($row = sql_fetch_array($res)) {
