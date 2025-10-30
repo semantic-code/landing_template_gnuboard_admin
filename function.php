@@ -207,11 +207,17 @@ function attach_file(
         @chmod($upload_dir, G5_DIR_PERMISSION);
     }
 
-    // 파일이 없어도 return true
-    if (!isset($files['name']) || !is_array($files['name'])) {
-        return true;
+    // enctype 누락 감지
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_FILES)) {
+        alert("The form is missing the enctype attribute.");
+        return false;
     }
 
+    // 파일이 없어도 return true
+    if (empty($files) || empty($files['name'][0])) {
+        return true;
+    }
+    
     // 현재 wr_id에서 가장 큰 bf_no 조회, 다음 번호부터 생성
     $sql = "SELECT MAX(bf_no) AS max_bf_no FROM {$g5['board_file_table']} WHERE bo_table = '{$bo_table}' AND wr_id = '{$wr_id}' ";
     $row = sql_fetch($sql);
