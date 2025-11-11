@@ -81,7 +81,7 @@ function get_empty_fields(string $target_table, array $ignore_cols = []): array 
  *
  * @param array $file         그누보드 파일정보 배열 ($file)
  * @param int|null $upload_count 업로드 허용 개수 (기본값 2)
- * @param string $title       제목 텍스트 (기본: "파일첨부")
+ * @param string $title       제목 텍스트 (기본: "파일첨부"), 현재 사용안함
  * @return string             HTML 문자열 반환
  */
 
@@ -108,7 +108,7 @@ function make_file_list_html(
     </style>
 
     <div class="file-upload-box">
-        <div class="file-upload-title"><?= htmlspecialchars($title) ?></div>
+        <div class="file-upload-title" style="display:none;"><?= htmlspecialchars($title) ?></div>
         <ul class="file-list">
             <?php for ($i = 0; $i < $upload_count ; $i++): ?>
                 <?php if (!empty($file[$i]['file'])): ?>
