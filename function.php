@@ -97,6 +97,7 @@ function make_file_list_html(
         .file-upload-title{font-weight:600;margin-bottom:10px;font-size:14px;color:#333}
         .file-list{list-style:none;margin:0;padding:0}
         .file-list li{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:6px;background:#fff;border:1px solid #ddd;border-radius:6px}
+        .file-list li.file-uploaded{background: #EDF2FA;}
         .file-list li:last-child{margin-bottom:0}
         .file-name{color:#333;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:260px}
         .file-delete{display:flex;align-items:center;gap:4px;color:#d9534f;font-size:13px;cursor:pointer}
@@ -111,7 +112,7 @@ function make_file_list_html(
         <ul class="file-list">
             <?php for ($i = 0; $i < $upload_count ; $i++): ?>
                 <?php if (!empty($file[$i]['file'])): ?>
-                    <li>
+                    <li class="file-uploaded">
                         <span class="file-name">
                             <?php $href = "{$file[$i]['path']}/{$file[$i]['file']}"; ?>
                             <?php $file_source = htmlspecialchars($file[$i]['source']); ?>
