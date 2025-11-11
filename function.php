@@ -77,6 +77,66 @@ function get_empty_fields(string $target_table, array $ignore_cols = []): array 
 }
 
 /**
+ * 파일 리스트 + 첨부 HTML 생성 (패딩형, 미리보기 구조)
+ *
+ * @param array $file         그누보드 파일정보 배열 ($file)
+ * @param int|null $upload_count 업로드 허용 개수 (기본값 2)
+ * @param string $title       제목 텍스트 (기본: "파일첨부")
+ * @return string             HTML 문자열 반환
+ */
+
+function make_file_list_html(
+    array $file = array(),
+    ?int $upload_count = null,
+    string $title = '파일첨부'
+): string
+{
+    ob_start(); ?>
+    <style>
+        .file-upload-box{border:1px solid #e5e5e5;background:#fafafa;padding:15px;border-radius:4px;margin-top:20px;font-size:14px}
+        .file-upload-title{font-weight:600;margin-bottom:10px;font-size:14px;color:#333}
+        .file-list{list-style:none;margin:0;padding:0}
+        .file-list li{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:6px;background:#fff;border:1px solid #ddd;border-radius:6px}
+        .file-list li:last-child{margin-bottom:0}
+        .file-name{color:#333;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:260px}
+        .file-delete{display:flex;align-items:center;gap:4px;color:#d9534f;font-size:13px;cursor:pointer}
+        .file-delete input[type="checkbox"]{width:14px;height:14px}
+        .file-input-row{margin-top:10px;padding:10px 12px;background:#fff;border:1px dashed #ddd;border-radius:6px}
+        .file-input-row input[type="file"]{width:100%}
+        .file-help{display:block;color:#888;font-size:12px;margin-top:4px}
+    </style>
+
+    <div class="file-upload-box">
+        <div class="file-upload-title"><?= htmlspecialchars($title) ?></div>
+        <ul class="file-list">
+            <?php for ($i = 0; $i < $upload_count ; $i++): ?>
+                <?php if (!empty($file[$i]['file'])): ?>
+                    <li>
+                        <span class="file-name">
+                            <?php $href = "{$file[$i]['path']}/{$file[$i]['file']}"; ?>
+                            <?php $file_source = htmlspecialchars($file[$i]['source']); ?>
+                            <a href="<?= $href ?>" download="<?= $file_source?>"><?= $file_source?></a>
+                        </span>
+
+                        <label class="file-delete">
+                            <input type="checkbox" name="bf_file_del[<?= $i ?>]" value="1">
+                            <span>삭제</span>
+                        </label>
+                    </li>
+                    <?php continue; ?>
+                <?php endif; ?>
+
+                <li class="file-input-row">
+                    <input type="file" name="bf_file[]">
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </div>
+
+    <?php return ob_get_clean();
+}
+
+/**
  * 파일 업로드 입력창 HTML 생성
  *
  * @param string $bo_table       게시판 테이블명 (기존 파일 미리보기 경로용)
