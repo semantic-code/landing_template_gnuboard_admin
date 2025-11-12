@@ -289,7 +289,7 @@ function get_file_upload_js(
  *
  * @return bool  파일 업로드 성공여부
  **/
-function attach_file(
+function attach_files(
     array  $files,
     string $bo_table,
     int    $wr_id,
