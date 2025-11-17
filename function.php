@@ -73,7 +73,7 @@ function get_empty_fields(string $target_table, array $ignore_cols = []): array 
         }
     }
 
-    return $fields;
+    return array_fill_keys($fields, '');
 }
 
 /**
@@ -85,7 +85,7 @@ function get_empty_fields(string $target_table, array $ignore_cols = []): array 
  * @return string             HTML 문자열 반환
  */
 
-function make_file_list_html(
+function make_file_upload_list_html(
     array $file = array(),
     ?int $upload_count = null,
     string $title = '파일첨부'
